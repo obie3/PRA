@@ -61,7 +61,6 @@ export default class Home extends Component {
   }
 
   onPictureSaved = async photo => {
-    //saves photo to storage
     await this.props.savePhoto(photo);
   };
 
@@ -227,8 +226,7 @@ export default class Home extends Component {
             <Preloader
             visible={this.state.showLoading}
           />
-          </Camera>
-         
+          </Camera>   
         </View>
       );
     }
