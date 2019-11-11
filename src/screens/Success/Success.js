@@ -14,9 +14,8 @@ export default class Success extends Component {
             <Image
               style={styles.loaderImage}
               source={require('../../assets/images/success.gif')}
-              /* source={require('../../assets/images/whiteLoader.gif')} */
-
             />
+            <Text style={styles.paragraph}>{'Success!'}</Text>
           </View>
         </View>
     );

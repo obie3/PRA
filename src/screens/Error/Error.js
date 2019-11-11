@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import { PropTypes } from 'prop-types';
-import { View, Image, StyleSheet,} from 'react-native';
+import { View, Image, StyleSheet, Text} from 'react-native';
 
 export default class Error extends Component {
  
@@ -18,6 +18,8 @@ export default class Error extends Component {
               /* source={require('../../assets/images/whiteLoader.gif')} */
 
             />
+            <Text style={styles.paragraph}>{this.props.navigation.getParam('message')}</Text>
+
           </View>
         </View>
     );

@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { PropTypes } from 'prop-types';
 import { View, Image, StyleSheet,} from 'react-native';
 
 export default class Network extends Component {
@@ -14,10 +13,9 @@ export default class Network extends Component {
             <Image
               style={styles.loaderImage}
               source={require('../../assets/images/network.gif')}
-              /* source={require('../../assets/images/whiteLoader.gif')} */
-
             />
           </View>
+          <Text style={styles.paragraph}>{this.props.navigation.getParam('message')}</Text>
         </View>
     );
   }
