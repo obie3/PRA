@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import { PropTypes } from 'prop-types';
-import { View, Image, StyleSheet,} from 'react-native';
+import { View, Image, StyleSheet, Text} from 'react-native';
 
 export default class Success extends Component {
  

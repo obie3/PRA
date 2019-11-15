@@ -166,7 +166,7 @@ export default class Home extends Component {
                 />          
               </TouchableOpacity>
             </View> 
-             
+
             <View style={styles.capturebuttonLayout}>  
               <TouchableOpacity
                 style={styles.capturebutton}
@@ -177,18 +177,19 @@ export default class Home extends Component {
                     name="replay"
                     size={42}
                     color={disabled ? "red" : "gray"}
-                  />       
+                  />   
+                <Image
+                  onPress={this.handlePhoto}
+                  source = {require('../../assets/images/circle.png')}
+                  style = {StyleSheet.flatten(styles.cameraImage)}
+                />      
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.capturebutton1 }
                 onPress={this.handlePhoto}
                 disabled={disabled}>
-                 {/* <Ionicons 
-                    name="ios-camera" 
-                    size={42} 
-                    color={disabled ? "gray" : "green"}
-                    />  */}
+      
                 <Image
                   onPress={this.handlePhoto}
                   source = {require('../../assets/images/circle.png')}
