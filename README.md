@@ -11,14 +11,13 @@ You'll find the Expo guide & docs [here](https://docs.expo.io).
 
 ## Setup
 * Navigate to your terminal
-* Clone the repository using `git clone https://github.com/pictdaNG/react-native-expo-boilerplate.git` in your terminal
+* Clone the repository using `git clone https://github.com/obie3/PRA.git` in your terminal
 * Navigate into the directory where the cloned project is located in your terminal
-* Run `cd react-native-expo-boilerplate.git` in your terminal
+* Run `cd PICTDA.git` in your terminal
 * Next run `yarn install`  or `npm install` in your terminal to install dependencies
 * Run `yarn start` in your terminal to start the React Native packager - so that you can run/access the app
 * Follow the instructions that show up in your terminal to run the app in any environment of your choice
 
-* Running version can be found by browsing the QR Code in this [link](https://expo.io/@edwardobande36/react-native-expo-boilerplate.)
 
 ## Note
 
