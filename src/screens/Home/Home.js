@@ -170,7 +170,7 @@ export default class Home extends Component {
                 style={styles.falshView}
                 onPress={this.toggleFlash}>
                 <Image
-                  onPress={this.handlePhoto}
+                  onPress={this.toggleFlash}
                   source = {require('../../assets/images/flash.png')}
                   style = {StyleSheet.flatten(styles.flashImage)}
                 />          
