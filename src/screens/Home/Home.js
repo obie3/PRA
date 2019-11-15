@@ -1,6 +1,6 @@
 'use strict';
 import React, {Component} from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import {DisplayText, SubmitButton} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
@@ -32,13 +32,12 @@ export default class Home extends Component {
     this.getLocationAsync();
   }
 
-
   getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
-      return this.props.navigation.navigate('Error' , {
-        'message' : 'Permssion to Get Locations Not Granted'
-      });
+      // return this.props.navigation.navigate('Error' , {
+      //   'message' : 'Permssion to Get Locations Not Granted'
+      // });
     }
 
     let location = await Location.getCurrentPositionAsync({});
@@ -142,9 +141,9 @@ export default class Home extends Component {
       return <View />;
     } 
     else if (hasCameraPermission === false) {
-      return this.props.navigation.navigate('Error' , {
-        'message' : 'Permssion Not Granted'
-      });
+      // return this.props.navigation.navigate('Error' , {
+      //   'message' : 'Permssion Not Granted'
+      // });
     } 
     else {
       return (
@@ -154,9 +153,20 @@ export default class Home extends Component {
             flashMode={flash ? flash : Camera.Constants.FlashMode.off}
             autoFocus={Camera.Constants.AutoFocus.on}
             type={type}
-            ref={ref => { this.camera = ref; }}
-          >
-            
+            ref={ref => { this.camera = ref; }}>
+
+            <View style = {styles.topBar}>
+              <TouchableOpacity
+                style={styles.falshView}
+                onPress={this.toggleFlash}>
+                <Image
+                  onPress={this.handlePhoto}
+                  source = {require('../../assets/images/flash.png')}
+                  style = {StyleSheet.flatten(styles.flashImage)}
+                />          
+              </TouchableOpacity>
+            </View> 
+             
             <View style={styles.capturebuttonLayout}>  
               <TouchableOpacity
                 style={styles.capturebutton}
@@ -171,22 +181,19 @@ export default class Home extends Component {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.capturebutton}
-                onPress={this.toggleFlash}>
-                <Ionicons name="md-flashlight" 
-                  size={42} 
-                  color={flash ? "green" : "gray"}
-                 />        
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.capturebutton}
+                style={styles.capturebutton1 }
                 onPress={this.handlePhoto}
                 disabled={disabled}>
-                 <Ionicons 
+                 {/* <Ionicons 
                     name="ios-camera" 
                     size={42} 
                     color={disabled ? "gray" : "green"}
-                    />          
+                    />  */}
+                <Image
+                  onPress={this.handlePhoto}
+                  source = {require('../../assets/images/circle.png')}
+                  style = {StyleSheet.flatten(styles.cameraImage)}
+                />         
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.capturebutton}
