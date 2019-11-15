@@ -178,11 +178,11 @@ export default class Home extends Component {
                     size={42}
                     color={disabled ? "red" : "gray"}
                   />   
-                <Image
+                {/* <Image
                   onPress={this.handlePhoto}
                   source = {require('../../assets/images/circle.png')}
                   style = {StyleSheet.flatten(styles.cameraImage)}
-                />      
+                />       */}
               </TouchableOpacity>
 
               <TouchableOpacity
