@@ -20,7 +20,7 @@ export default styles = StyleSheet.create({
   capturebuttonLayout : {
     // flex: 1,
     // backgroundColor: 'transparent',
-    backgroundColor: '#000',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'space-evenly',
@@ -55,12 +55,13 @@ export default styles = StyleSheet.create({
     backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems:'center',
-    justifyContent:'flex-start',
+    justifyContent: 'space-between',
     height: '10%',
     width: '100%',
     position: 'absolute',
     top: 0,
-    paddingLeft: 16,
+    paddingHorizontal: 16,
+    paddingTop: 18,
   },
 
   text: {
@@ -85,8 +86,18 @@ export default styles = StyleSheet.create({
     height: 25,
   },
   flashImage: {
-    width: 18,
-    height: 18,
+    width: 25,
+    height: 25,
+    tintColor: '#ffffff',
+  },
+  refreshImage: {
+    width: 25,
+    height: 25,
+    tintColor: '#ffffff',
+  },
+  uploadImage: {
+    width: 30,
+    height: 30,
     tintColor: '#ffffff',
   }
 });

@@ -1,7 +1,7 @@
 'use strict';
 import React, {Component} from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import {DisplayText, SubmitButton} from '../../components';
+import {DisplayText, SubmitButton, Preloader} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
 import Constants from 'expo-constants';
@@ -9,7 +9,6 @@ import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { Audio } from 'expo-av';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +21,7 @@ export default class Home extends Component {
       photo : null,
       latitude: null,
       longitude: null,
+      showLoading: false,
 
     }
   }
@@ -61,7 +61,6 @@ export default class Home extends Component {
   }
 
   onPictureSaved = async photo => {
-    //saves photo to storage
     await this.props.savePhoto(photo);
   };
 
@@ -95,7 +94,9 @@ export default class Home extends Component {
     }
   }
 
-
+  handleBackPress = () => {
+    console.log('hello clickcing back')
+  }
   submitPhoto = async () => {
     let body = JSON.stringify({
       'photo' : this.state.photo,
@@ -136,7 +137,7 @@ export default class Home extends Component {
   }
 
   render () {
-    const { hasCameraPermission, type , flash, disabled} = this.state;
+    const { hasCameraPermission, type , flash, disabled, showLoading} = this.state;
     if (hasCameraPermission === null) {
       return <View />;
     } 
@@ -158,6 +159,15 @@ export default class Home extends Component {
             <View style = {styles.topBar}>
               <TouchableOpacity
                 style={styles.falshView}
+                onPress={this.handleBackPress}>
+                <Image
+                  onPress={this.handleBackPress}
+                  source = {require('../../assets/images/back.png')}
+                  style = {StyleSheet.flatten(styles.flashImage)}
+                />          
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.falshView}
                 onPress={this.toggleFlash}>
                 <Image
                   onPress={this.handlePhoto}
@@ -171,18 +181,12 @@ export default class Home extends Component {
               <TouchableOpacity
                 style={styles.capturebutton}
                 onPress={this.retakePhoto}
-                disabled={!disabled}
-                >
-                <MaterialIcons
-                    name="replay"
-                    size={42}
-                    color={disabled ? "red" : "gray"}
-                  />   
-                {/* <Image
-                  onPress={this.handlePhoto}
-                  source = {require('../../assets/images/circle.png')}
-                  style = {StyleSheet.flatten(styles.cameraImage)}
-                />       */}
+                disabled={!disabled}>
+                <Image
+                  onPress={this.retakePhoto}
+                  source = {require('../../assets/images/refresh.png')}
+                  style = {StyleSheet.flatten(styles.refreshImage)}
+                />      
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -199,16 +203,17 @@ export default class Home extends Component {
               <TouchableOpacity
                 style={styles.capturebutton}
                 onPress={this.submitPhoto}
-                disabled={!disabled}
-              >
-                  <Ionicons 
-                    name="md-checkmark-circle-outline" 
-                    size={42} 
-                    color={disabled ? "green" : "gray"}
-                  />        
+                disabled={!disabled}>
+                <Image
+                  onPress={this.submitPhoto}
+                  source = {require('../../assets/images/upload.png')}
+                  style = {StyleSheet.flatten(styles.uploadImage)}/>    
               </TouchableOpacity>
             </View>
-          </Camera>
+            <Preloader
+              visible={this.state.showLoading}
+            />
+          </Camera>   
         </View>
       );
     }
