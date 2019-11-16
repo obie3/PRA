@@ -18,17 +18,14 @@ export default styles = StyleSheet.create({
   },
 
   capturebuttonLayout : {
-    // flex: 1,
-    // backgroundColor: 'transparent',
     backgroundColor: 'rgba(0,0,0,0.6)',
     flexDirection: 'row',
-    alignItems:'center',
+    alignItems:'center',  
     justifyContent:'space-evenly',
     height: '13%',
     width: '100%',
     position: 'absolute',
     bottom: 0,
-    // paddingBottom: 4,
   },
 
   capturebutton : {
