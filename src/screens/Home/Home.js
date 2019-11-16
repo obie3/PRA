@@ -1,7 +1,7 @@
 'use strict';
 import React, {Component} from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import {Preloader} from '../../components';
+// import {Preloader} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -105,7 +105,7 @@ export default class Home extends Component {
   }
 
   handleBackPress = () => {
-    console.log('hello clickcing back')
+    return this.props.navigation.goBack();
   }
 
   submitPhoto = async () => {
@@ -234,9 +234,9 @@ export default class Home extends Component {
                   style = {StyleSheet.flatten(styles.uploadImage)}/>    
               </TouchableOpacity>
             </View>
-            <Preloader
+            {/* <Preloader
               visible={this.state.showLoading}
-            />
+            /> */}
           </Camera>   
         </View>
       );

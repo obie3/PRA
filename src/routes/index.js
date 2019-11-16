@@ -49,7 +49,7 @@ import StartScreen from '../screens/StartScreen/StartScreen'
 
 
 const AppSwitchNavigator = createSwitchNavigator({
-    AuthLoading:Home,
+    AuthLoading:StartScreen,
     Auth:AuthStack,
   },
   {
