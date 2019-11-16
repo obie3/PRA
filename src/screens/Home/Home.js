@@ -1,14 +1,12 @@
 'use strict';
 import React, {Component} from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import {DisplayText, SubmitButton, Preloader} from '../../components';
+import {Preloader} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
-import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { Audio } from 'expo-av';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -55,7 +53,7 @@ export default class Home extends Component {
         .then(photo => {
           photo.exif.Orientation = 1;  
           this.camera.pausePreview();     
-          this.setState({photo : photo, disabled : true});  
+          this.setState({photo : photo.base64, disabled : true});  
         });     
     }
   }
@@ -94,46 +92,72 @@ export default class Home extends Component {
     }
   }
 
+  showLoadingDialogue(){
+    return this.setState({
+      showLoading : true,
+    });
+  }
+
+  hideLoadingDialogue =async()=> {
+    return this.setState({
+      showLoading : false,
+    });
+  }
+
   handleBackPress = () => {
     console.log('hello clickcing back')
   }
+
   submitPhoto = async () => {
-    let body = JSON.stringify({
-      'photo' : this.state.photo,
-      'longitude' : this.state.longitude,
-      'latitude' : this.state.latitude,
-    });
+    this.showLoadingDialogue();
+    let body = {
+      'photo' :  'hellooooo......', //this.state.photo,
+      'longitude' : this.state.longitude.toString(),
+      'latitude' : this.state.latitude.toString(),
+    };
     const settings = {
-      method: 'PATCH',
+      method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      'body' : body,
-    };
-  
+      'body' : JSON.stringify(body),
+    };  
     try {
-      let response = await fetch(`${UpdateArticlesEndpoint}${id}`, settings);
+      let response = await fetch(`${'https://pot-hole.herokuapp.com/api/reports/create'}`, settings);
+      console.log({response})
       let res = await response.json();
-      if(typeof res.message == 'undefined') {
-        return this.props.navigation.navigate('Success');      
+      if(typeof res.data !== 'undefined') {
+        this.hideLoadingDialogue().then(()=> {
+          return this.props.navigation.navigate('Success');      
+        });
       } 
-      return this.props.navigation.navigate('Dashboard');
-
+      else {
+        this.hideLoadingDialogue().then(()=> {
+          return this.props.navigation.navigate('Error', {
+            'message' : 'Oops Something went Wrong, Try again'
+          });      
+        })
+        
+      }
     } 
     catch(error){
+      console.log({response})
       if(error.toString().includes('network')){
-        return this.props.navigation.navigate('Error' , {
-          'message' : 'Please Check Network Connection'
-        });      
+        this.hideLoadingDialogue().then(()=> {
+          return this.props.navigation.navigate('Netwrok', {
+            'message' : 'Check Internet Connection'
+          });      
+        })     
       }
       else {
-        return this.props.navigation.navigate('Error' , {
-          'message' : error.toString(),
-        });
+        this.hideLoadingDialogue().then(()=> {
+          return this.props.navigation.navigate('Error', {
+            'message' : error.toString(),
+          });      
+        })
       }
-    }
-      
+    }    
   }
 
   render () {
