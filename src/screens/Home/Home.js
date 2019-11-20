@@ -1,7 +1,7 @@
 'use strict';
 import React, {Component} from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-// import {Preloader} from '../../components';
+ import {Preloader} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -33,20 +33,29 @@ export default class Home extends Component {
   getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
-      // return this.props.navigation.navigate('Error' , {
-      //   'message' : 'Permssion to Get Locations Not Granted'
-      // });
+      return this.props.navigation.navigate('Error' , {
+        'message' : 'Permssion to Get Locations Not Granted'
+      });
     }
 
-    let location = await Location.getCurrentPositionAsync({});
-    this.setState({ latitude: location.coords.latitude, 
-      longitude: location.coords.longitude 
-    });
+    await Location.getCurrentPositionAsync({
+      accuracy : 5,
+      mayShowUserSettingsDialog : true
+    }).then((location) => {
+      this.setState({ latitude: location.coords.latitude, 
+        longitude: location.coords.longitude 
+      });
+    }).catch(() => {
+      return this.props.navigation.navigate('Error' , {
+        'message' : 'Could not get Location Details Pls try again'
+      });
+    })
+    
   };
 
 
   handlePhoto = async () => {
-    this.btnSound();
+    //this.btnSound();
     const options = { quality: 1, base64: true,fixOrientation: true, exif: true};
     if (this.camera) {
       await this.camera.takePictureAsync(options)
@@ -105,15 +114,16 @@ export default class Home extends Component {
   }
 
   handleBackPress = () => {
-    return this.props.navigation.goBack();
+    return this.props.navigation.navigate('StartScreen');
   }
 
   submitPhoto = async () => {
     this.showLoadingDialogue();
     let body = {
-      'photo' :  'hellooooo......', //this.state.photo,
+      'photo' :  this.state.photo,
       'longitude' : this.state.longitude.toString(),
       'latitude' : this.state.latitude.toString(),
+      'extension' : 'png'
     };
     const settings = {
       method: 'POST',
@@ -125,15 +135,19 @@ export default class Home extends Component {
     };  
     try {
       let response = await fetch(`${'https://pot-hole.herokuapp.com/api/reports/create'}`, settings);
-      console.log({response})
+      console.log({'ressss....' : response})
       let res = await response.json();
       if(typeof res.data !== 'undefined') {
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Success');      
+          this.camera.resumePreview();     
+          return this.props.navigation.navigate('Success',{
+            'message' : 'Success'
+          });      
         });
       } 
       else {
         this.hideLoadingDialogue().then(()=> {
+          this.camera.resumePreview();     
           return this.props.navigation.navigate('Error', {
             'message' : 'Oops Something went Wrong, Try again'
           });      
@@ -142,17 +156,16 @@ export default class Home extends Component {
       }
     } 
     catch(error){
-      console.log({response})
       if(error.toString().includes('network')){
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Netwrok', {
+          return this.props.navigation.navigate('Error', {
             'message' : 'Check Internet Connection'
           });      
         })     
       }
       else {
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Error', {
+          return this.props.navigation.navigate('Network', {
             'message' : error.toString(),
           });      
         })
@@ -166,9 +179,9 @@ export default class Home extends Component {
       return <View />;
     } 
     else if (hasCameraPermission === false) {
-      // return this.props.navigation.navigate('Error' , {
-      //   'message' : 'Permssion Not Granted'
-      // });
+      return this.props.navigation.navigate('Error' , {
+        'message' : 'Grant Camera to Continue'
+      });
     } 
     else {
       return (
@@ -178,6 +191,7 @@ export default class Home extends Component {
             flashMode={flash ? flash : Camera.Constants.FlashMode.off}
             autoFocus={Camera.Constants.AutoFocus.on}
             type={type}
+            quality={0}
             ref={ref => { this.camera = ref; }}>
 
             <View style = {styles.topBar}>
@@ -234,9 +248,9 @@ export default class Home extends Component {
                   style = {StyleSheet.flatten(styles.uploadImage)}/>    
               </TouchableOpacity>
             </View>
-            {/* <Preloader
+            <Preloader
               visible={this.state.showLoading}
-            /> */}
+            />
           </Camera>   
         </View>
       );
