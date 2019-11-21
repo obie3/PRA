@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, SafeAreaView , Image, TouchableOpacity,StyleSheet} from 'react-native';
 import styles from './styles';
-import {DisplayText, AuthBackground, SubmitButton} from '../../components'
+import {DisplayText, AuthBackground} from '../../components'
 class StartScreen extends Component {
   constructor(props) {
     super(props);
@@ -10,7 +10,7 @@ class StartScreen extends Component {
   }
 
   handleSnap = () => {
-    return this.props.navigation.navigate('Home')
+    return this.props.navigation.navigate('Home');
   }
 
   render() {
