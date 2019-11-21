@@ -1,15 +1,21 @@
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { StatusBar } from 'react-native';
-import  Home  from '../screens/Home/Home';
-import  Error  from '../screens/Error/Error';
-import  Success  from '../screens/Success/Success';
-import  Network  from '../screens/Network/Network';
-
-
+import Home  from '../screens/Home/Home';
+import Error  from '../screens/Error/Error';
+import Success  from '../screens/Success/Success';
+import Network  from '../screens/Network/Network';
+import StartScreen from '../screens/StartScreen/StartScreen' 
 
 
  const AuthStack = createStackNavigator({ 
+  StartScreen: {
+    screen: StartScreen,
+    navigationOptions: {
+      header: null
+    }
+  },
+
   Home: {
     screen: Home,
     navigationOptions: {
@@ -23,8 +29,6 @@ import  Network  from '../screens/Network/Network';
       header: null
     },
   },
-
-
   Error: {
     screen: Error,
     navigationOptions: {
@@ -45,7 +49,7 @@ import  Network  from '../screens/Network/Network';
 
 
 const AppSwitchNavigator = createSwitchNavigator({
-    AuthLoading:Home,
+    AuthLoading:StartScreen,
     Auth:AuthStack,
   },
   {

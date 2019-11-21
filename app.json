@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PICTDA",
-    "description": "This project is really great.",
+    "name": "iReport",
+    "description": "This project provides a medium to crowdsource info from Public with respect to roads in bad condition in Jos metropolis Plateau State",
     "slug": "PICTDA",
     "privacy": "public",
     "sdkVersion": "35.0.0",
@@ -15,7 +15,31 @@
     "splash": {
       "image": "./src/assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#416A59"
+    },
+
+    "android": {
+      "package": "ng.gov.plateau.www",
+      "versionCode": 1,
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=",
+      "permissions": [
+        "com.htc.launcher.permission.UPDATE_SHORTCUT",
+        "CAMERA",
+        "READ_PHONE_STATE"
+      ],
+      "splash": {
+        "resizeMode": "contain",
+        "mdpi": "./src/assets/images/splash.png",
+        "hdpi": "./src/assets/images/splash.png",
+        "xhdpi": "./src/assets/images/splash.png",
+        "backgroundColor": "#2D002B"
+      },
+      "config": {
+        "fabric": {
+          "apiKey": "f4c6d386ecadd3ebe0d71c5769113ac0ecfa76ac",
+          "buildSecret": "3d37edf3c238007caee6d09968c4a3f7334267b9c0015bdc604f2169abf01831"
+        }
+      }
     },
     "updates": {
       "fallbackToCacheTimeout": 0

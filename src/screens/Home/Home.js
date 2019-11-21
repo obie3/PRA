@@ -1,15 +1,12 @@
 'use strict';
 import React, {Component} from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
-import {Preloader} from '../../components';
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
+ import {Preloader} from '../../components';
 import styles from './styles';
 import { Camera } from 'expo-camera';
-import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { Audio } from 'expo-av';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +19,8 @@ export default class Home extends Component {
       photo : null,
       latitude: null,
       longitude: null,
-      showLoading:false,
+      showLoading: false,
+
     }
   }
 
@@ -32,7 +30,6 @@ export default class Home extends Component {
     this.getLocationAsync();
   }
 
-
   getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
@@ -40,15 +37,25 @@ export default class Home extends Component {
         'message' : 'Permssion to Get Locations Not Granted'
       });
     }
-    let location = await Location.getCurrentPositionAsync({ enableHighAccuracy: true });
-    this.setState({ latitude: location.coords.latitude, 
-      longitude: location.coords.longitude 
-    });
+
+    await Location.getCurrentPositionAsync({
+      accuracy : 5,
+      mayShowUserSettingsDialog : true
+    }).then((location) => {
+      this.setState({ latitude: location.coords.latitude, 
+        longitude: location.coords.longitude 
+      });
+    }).catch(() => {
+      return this.props.navigation.navigate('Error' , {
+        'message' : 'Could not get Location Details Pls try again'
+      });
+    })
+    
   };
 
 
   handlePhoto = async () => {
-    this.btnSound();
+    //this.btnSound();
     const options = { quality: 1, base64: true,fixOrientation: true, exif: true};
     if (this.camera) {
       await this.camera.takePictureAsync(options)
@@ -102,17 +109,21 @@ export default class Home extends Component {
 
   hideLoadingDialogue =async()=> {
     return this.setState({
-      restoring : false,
+      showLoading : false,
     });
   }
 
+  handleBackPress = () => {
+    return this.props.navigation.navigate('StartScreen');
+  }
 
   submitPhoto = async () => {
-    this.showLoadingDialogue()
+    this.showLoadingDialogue();
     let body = {
-      'photo' : this.state.photo,
-      'longitude' : this.state.longitude.toString,
-      'latitude' : this.state.latitude,
+      'photo' :  this.state.photo,
+      'longitude' : this.state.longitude.toString(),
+      'latitude' : this.state.latitude.toString(),
+      'extension' : 'png'
     };
     const settings = {
       method: 'POST',
@@ -121,18 +132,22 @@ export default class Home extends Component {
         'Content-Type': 'application/json',
       },
       'body' : JSON.stringify(body),
-    };
-  
+    };  
     try {
       let response = await fetch(`${'https://pot-hole.herokuapp.com/api/reports/create'}`, settings);
+      console.log({'ressss....' : response})
       let res = await response.json();
       if(typeof res.data !== 'undefined') {
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Success');      
+          this.camera.resumePreview();     
+          return this.props.navigation.navigate('Success',{
+            'message' : 'Success'
+          });      
         });
       } 
       else {
         this.hideLoadingDialogue().then(()=> {
+          this.camera.resumePreview();     
           return this.props.navigation.navigate('Error', {
             'message' : 'Oops Something went Wrong, Try again'
           });      
@@ -143,30 +158,29 @@ export default class Home extends Component {
     catch(error){
       if(error.toString().includes('network')){
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Netwrok', {
+          return this.props.navigation.navigate('Error', {
             'message' : 'Check Internet Connection'
           });      
         })     
       }
       else {
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Error', {
+          return this.props.navigation.navigate('Network', {
             'message' : error.toString(),
           });      
         })
       }
-    }
-      
+    }    
   }
 
   render () {
-    const { hasCameraPermission, type , flash, disabled} = this.state;
+    const { hasCameraPermission, type , flash, disabled, showLoading} = this.state;
     if (hasCameraPermission === null) {
       return <View />;
     } 
     else if (hasCameraPermission === false) {
       return this.props.navigation.navigate('Error' , {
-        'message' : 'Permssion Not Granted'
+        'message' : 'Grant Camera to Continue'
       });
     } 
     else {
@@ -177,55 +191,66 @@ export default class Home extends Component {
             flashMode={flash ? flash : Camera.Constants.FlashMode.off}
             autoFocus={Camera.Constants.AutoFocus.on}
             type={type}
-            ref={ref => { this.camera = ref; }}
-          >
-            
+            quality={0}
+            ref={ref => { this.camera = ref; }}>
+
+            <View style = {styles.topBar}>
+              <TouchableOpacity
+                style={styles.falshView}
+                onPress={this.handleBackPress}>
+                <Image
+                  onPress={this.handleBackPress}
+                  source = {require('../../assets/images/back.png')}
+                  style = {StyleSheet.flatten(styles.flashImage)}
+                />          
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.falshView}
+                onPress={this.toggleFlash}>
+                <Image
+                  onPress={this.toggleFlash}
+                  source = {require('../../assets/images/flash.png')}
+                  style = {StyleSheet.flatten(styles.flashImage)}
+                />          
+              </TouchableOpacity>
+            </View> 
+
             <View style={styles.capturebuttonLayout}>  
               <TouchableOpacity
                 style={styles.capturebutton}
                 onPress={this.retakePhoto}
-                disabled={!disabled}
-                >
-                <MaterialIcons
-                    name="replay"
-                    size={42}
-                    color={disabled ? "red" : "gray"}
-                  />       
+                disabled={!disabled}>
+                <Image
+                  onPress={this.retakePhoto}
+                  source = {require('../../assets/images/refresh.png')}
+                  style = {StyleSheet.flatten(styles.refreshImage)}
+                />      
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.capturebutton}
-                onPress={this.toggleFlash}>
-                <Ionicons name="md-flashlight" 
-                  size={42} 
-                  color={flash ? "green" : "gray"}
-                 />        
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.capturebutton}
+                style={styles.capturebutton1 }
                 onPress={this.handlePhoto}
                 disabled={disabled}>
-                 <Ionicons 
-                    name="ios-camera" 
-                    size={42} 
-                    color={disabled ? "gray" : "green"}
-                    />          
+      
+                <Image
+                  onPress={this.handlePhoto}
+                  source = {require('../../assets/images/circle.png')}
+                  style = {StyleSheet.flatten(styles.cameraImage)}
+                />         
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.capturebutton}
                 onPress={this.submitPhoto}
-                disabled={!disabled}
-              >
-                <Ionicons 
-                  name="md-checkmark-circle-outline" 
-                  size={42} 
-                  color={disabled ? "green" : "gray"}
-                />        
+                disabled={!disabled}>
+                <Image
+                  onPress={this.submitPhoto}
+                  source = {require('../../assets/images/upload.png')}
+                  style = {StyleSheet.flatten(styles.uploadImage)}/>    
               </TouchableOpacity>
             </View>
             <Preloader
-            visible={this.state.showLoading}
-          />
+              visible={this.state.showLoading}
+            />
           </Camera>   
         </View>
       );
