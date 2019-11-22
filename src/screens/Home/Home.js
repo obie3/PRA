@@ -135,7 +135,6 @@ export default class Home extends Component {
     };  
     try {
       let response = await fetch(`${'https://pot-hole.herokuapp.com/api/reports/create'}`, settings);
-      console.log({'ressss....' : response})
       let res = await response.json();
       if(typeof res.data !== 'undefined') {
         this.hideLoadingDialogue().then(()=> {

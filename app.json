@@ -28,11 +28,11 @@
         "READ_PHONE_STATE"
       ],
       "splash": {
-        "resizeMode": "contain",
+        "resizeMode": "cover",
         "mdpi": "./src/assets/images/splash.png",
         "hdpi": "./src/assets/images/splash.png",
         "xhdpi": "./src/assets/images/splash.png",
-        "backgroundColor": "#2D002B"
+        "backgroundColor": "#ffffff"
       },
       "config": {
         "fabric": {
