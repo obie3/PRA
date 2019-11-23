@@ -6,18 +6,25 @@ import { View, Image, StyleSheet, TouchableOpacity,Text} from 'react-native';
 import styles from './styles';
 import {DisplayText} from '../../components'
 import { StackActions, NavigationActions } from 'react-navigation';
+import * as Permissions from 'expo-permissions';
+
 
 
 export default class Error extends Component {
  
-  handleTryAgain =()=>{
+  handleTryAgain = async () =>{
+    const { status } = await Permissions.getAsync(
+      Permissions.CAMERA,
+      Permissions.LOCATION,
+    );
+    location = status ? 'Home' : 'StartScreen';
     const resetAction = StackActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: 'Home' })],
+      actions: [NavigationActions.navigate({ routeName: location })],
     });
     this.props.navigation.dispatch(resetAction);
   }
-  render() {
+  render(){
   
     return (
       

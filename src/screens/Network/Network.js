@@ -5,11 +5,17 @@ import { View, Image, StyleSheet, TouchableOpacity, Linking, Text} from 'react-n
 import styles from './styles';
 import {DisplayText} from '../../components'
 import { StackActions, NavigationActions } from 'react-navigation';
-
+import * as Permissions from 'expo-permissions';
 
 export default class Network extends Component {
  
-  handleTryAgain =()=>{
+  handleTryAgain = async () => {
+    const { status } = await Permissions.getAsync(
+      Permissions.CAMERA,
+      Permissions.LOCATION,
+    );
+    location = status ? 'Home' : 'StartScreen';
+
     const resetAction = StackActions.reset({
       index: 0,
       actions: [NavigationActions.navigate({ routeName: 'Home' })],

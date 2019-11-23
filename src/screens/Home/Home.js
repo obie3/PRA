@@ -7,11 +7,14 @@ import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { Audio } from 'expo-av';
+import { NavigationActions, StackActions } from 'react-navigation';
+
 export default class Home extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.state ={
-      hasCameraPermission: null,
+      hasPermission: null,
       type: Camera.Constants.Type.back,
       flash: null,
       flashEnabled: false,
@@ -25,32 +28,32 @@ export default class Home extends Component {
   }
 
   async componentDidMount() {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasCameraPermission: status === 'granted' });
-    this.getLocationAsync();
+    this._isMounted = true;
+    const { status } = await Permissions.getAsync(
+      Permissions.CAMERA,
+      Permissions.LOCATION,
+    );
+    this.setState({ hasPermission: status === 'granted' });
+    this.getLocationAsync(status);
   }
 
-  getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      return this.props.navigation.navigate('Error' , {
-        'message' : 'Permssion to Get Locations Not Granted'
-      });
-    }
+  componentWillUnmount () {
+    this._isMounted = false;
 
-    await Location.getCurrentPositionAsync({
-      accuracy : 5,
-      mayShowUserSettingsDialog : true
-    }).then((location) => {
-      this.setState({ latitude: location.coords.latitude, 
-        longitude: location.coords.longitude 
-      });
-    }).catch(() => {
-      return this.props.navigation.navigate('Error' , {
-        'message' : 'Could not get Location Details Pls try again'
-      });
-    })
-    
+  }
+  getLocationAsync = async status => { 
+    if(status) {
+      await Location.getCurrentPositionAsync({
+        accuracy : 5,
+        mayShowUserSettingsDialog : true
+      }).then((location) => {
+        this.setState({ latitude: location.coords.latitude, 
+          longitude: location.coords.longitude 
+        });
+      }).catch(() => {
+        return this.resetNavigationStack('Couldnt get Location, Please try again', 'Error');
+      })
+    } 
   };
 
 
@@ -96,8 +99,9 @@ export default class Home extends Component {
         setTimeout(() => {
           soundObject.unloadAsync();
         }, status.playableDurationMillis + 1000);
-    } catch (error) {
-      console.warn(error);
+    } 
+    catch (error) {
+     // console.warn(error);
     }
   }
 
@@ -114,7 +118,18 @@ export default class Home extends Component {
   }
 
   handleBackPress = () => {
-    return this.props.navigation.navigate('StartScreen');
+    return this.resetNavigationStack('', 'StartScreen');
+  }
+
+  resetNavigationStack = (message, location) => {
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ 
+        routeName: location, 
+        params : { 'message': message}
+     })],
+    });
+    return this.props.navigation.dispatch(resetAction); 
   }
 
   submitPhoto = async () => {
@@ -139,121 +154,103 @@ export default class Home extends Component {
       if(typeof res.data !== 'undefined') {
         this.hideLoadingDialogue().then(()=> {
           this.camera.resumePreview();     
-          return this.props.navigation.navigate('Success',{
-            'message' : 'Success'
-          });      
+          return this.resetNavigationStack('Success..', 'Success');        
         });
       } 
       else {
         this.hideLoadingDialogue().then(()=> {
-          this.camera.resumePreview();     
-          return this.props.navigation.navigate('Error', {
-            'message' : 'Oops Something went Wrong, Try again'
-          });      
-        })
-        
+          this.camera.resumePreview();  
+          return this.resetNavigationStack('Oops Something Went Wrong, try again', 'Error');    
+        });   
       }
     } 
     catch(error){
       if(error.toString().includes('network')){
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Error', {
-            'message' : 'Check Internet Connection'
-          });      
-        })     
+          return this.resetNavigationStack('Check Internet Connection', 'Network');       
+        });   
       }
       else {
         this.hideLoadingDialogue().then(()=> {
-          return this.props.navigation.navigate('Network', {
-            'message' : error.toString(),
-          });      
-        })
+          return this.resetNavigationStack(error.toString(), 'Error');       
+        });
       }
     }    
   }
 
   render () {
-    const { hasCameraPermission, type , flash, disabled, showLoading} = this.state;
-    if (hasCameraPermission === null) {
-      return <View />;
-    } 
-    else if (hasCameraPermission === false) {
-      return this.props.navigation.navigate('Error' , {
-        'message' : 'Grant Camera to Continue'
-      });
-    } 
-    else {
-      return (
-        <View style={styles.container}>
-          <Camera 
-            style={styles.camera }
-            flashMode={flash ? flash : Camera.Constants.FlashMode.off}
-            autoFocus={Camera.Constants.AutoFocus.on}
-            type={type}
-            quality={0}
-            ref={ref => { this.camera = ref; }}>
+    const { type , flash, disabled } = this.state;
+    
+    return (
+      <View style={styles.container}>
+        <Camera 
+          style={styles.camera }
+          flashMode={flash ? flash : Camera.Constants.FlashMode.off}
+          autoFocus={Camera.Constants.AutoFocus.on}
+          type={type}
+          quality={0}
+          ref={ref => { this.camera = ref; }}>
 
-            <View style = {styles.topBar}>
-              <TouchableOpacity
-                style={styles.falshView}
-                onPress={this.handleBackPress}>
-                <Image
-                  onPress={this.handleBackPress}
-                  source = {require('../../assets/images/back.png')}
-                  style = {StyleSheet.flatten(styles.flashImage)}
-                />          
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.falshView}
-                onPress={this.toggleFlash}>
-                <Image
-                  onPress={this.toggleFlash}
-                  source = {require('../../assets/images/flash.png')}
-                  style = {StyleSheet.flatten(styles.flashImage)}
-                />          
-              </TouchableOpacity>
-            </View> 
+          <View style = {styles.topBar}>
+            <TouchableOpacity
+              style={styles.falshView}
+              onPress={this.handleBackPress}>
+              <Image
+                onPress={this.handleBackPress}
+                source = {require('../../assets/images/back.png')}
+                style = {StyleSheet.flatten(styles.flashImage)}
+              />          
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.falshView}
+              onPress={this.toggleFlash}>
+              <Image
+                onPress={this.toggleFlash}
+                source = {require('../../assets/images/flash.png')}
+                style = {StyleSheet.flatten(styles.flashImage)}
+              />          
+            </TouchableOpacity>
+          </View> 
 
-            <View style={styles.capturebuttonLayout}>  
-              <TouchableOpacity
-                style={styles.capturebutton}
+          <View style={styles.capturebuttonLayout}>  
+            <TouchableOpacity
+              style={styles.capturebutton}
+              onPress={this.retakePhoto}
+              disabled={!disabled}>
+              <Image
                 onPress={this.retakePhoto}
-                disabled={!disabled}>
-                <Image
-                  onPress={this.retakePhoto}
-                  source = {require('../../assets/images/refresh.png')}
-                  style = {StyleSheet.flatten(styles.refreshImage)}
-                />      
-              </TouchableOpacity>
+                source = {require('../../assets/images/refresh.png')}
+                style = {StyleSheet.flatten(styles.refreshImage)}
+              />      
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.capturebutton1 }
+            <TouchableOpacity
+              style={styles.capturebutton1 }
+              onPress={this.handlePhoto}
+              disabled={disabled}>
+    
+              <Image
                 onPress={this.handlePhoto}
-                disabled={disabled}>
-      
-                <Image
-                  onPress={this.handlePhoto}
-                  source = {require('../../assets/images/circle.png')}
-                  style = {StyleSheet.flatten(styles.cameraImage)}
-                />         
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.capturebutton}
+                source = {require('../../assets/images/circle.png')}
+                style = {StyleSheet.flatten(styles.cameraImage)}
+              />         
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.capturebutton}
+              onPress={this.submitPhoto}
+              disabled={!disabled}>
+              <Image
                 onPress={this.submitPhoto}
-                disabled={!disabled}>
-                <Image
-                  onPress={this.submitPhoto}
-                  source = {require('../../assets/images/upload.png')}
-                  style = {StyleSheet.flatten(styles.uploadImage)}/>    
-              </TouchableOpacity>
-            </View>
-            <Preloader
-              visible={this.state.showLoading}
-            />
-          </Camera>   
-        </View>
-      );
-    }
+                source = {require('../../assets/images/upload.png')}
+                style = {StyleSheet.flatten(styles.uploadImage)}/>    
+            </TouchableOpacity>
+          </View>
+          <Preloader
+            visible={this.state.showLoading}
+          />
+        </Camera>   
+      </View>
+    ); 
   } 
 } 
 

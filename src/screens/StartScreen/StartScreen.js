@@ -1,16 +1,50 @@
 import React, { Component } from 'react';
 import { View, SafeAreaView , Image, TouchableOpacity,StyleSheet} from 'react-native';
 import styles from './styles';
-import {DisplayText, AuthBackground} from '../../components'
+import {DisplayText, AuthBackground} from '../../components';
+import { NavigationActions, StackActions } from 'react-navigation';
+import * as Permissions from 'expo-permissions';
+
+
 class StartScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-    };
+      hasPermission: null,
+    }
+  }
+  
+    async componentDidMount() {
+      const { status } = await Permissions.askAsync(
+        Permissions.CAMERA,
+        Permissions.LOCATION,
+      );
+      this.setState({ hasPermission: status === 'granted' });
+    }
+
+  resetNavigationStack = (message, location) => {
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ 
+        routeName: location, 
+        params : { 'message': message}
+     })],
+    });  
+    return this.props.navigation.dispatch(resetAction); 
   }
 
   handleSnap = () => {
-    return this.props.navigation.navigate('Home');
+    const{hasPermission} = this.state;
+    if (hasPermission === null) {
+      return <View />;
+    } 
+    else if (hasPermission === false) {
+      return this.resetNavigationStack('Grant Camera and Location Permission to Continue', 'Error');
+    } 
+    else{
+      return this.resetNavigationStack('', 'Home');
+
+    }
   }
 
   render() {
@@ -37,7 +71,7 @@ class StartScreen extends Component {
           </View> 
           
           <View style = {styles.btnView}> 
-           
+          
             <TouchableOpacity 
               onPress={this.handleSnap}
               style={styles.btnStyle}>
@@ -51,6 +85,7 @@ class StartScreen extends Component {
         </SafeAreaView>
       </AuthBackground>
     );
+    
   }
 }
 
