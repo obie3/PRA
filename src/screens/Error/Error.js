@@ -17,7 +17,7 @@ export default class Error extends Component {
       Permissions.CAMERA,
       Permissions.LOCATION,
     );
-    location = status ? 'Home' : 'StartScreen';
+    let location = status == true ? 'Home' : 'StartScreen';
     const resetAction = StackActions.reset({
       index: 0,
       actions: [NavigationActions.navigate({ routeName: location })],

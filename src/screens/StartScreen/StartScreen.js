@@ -14,13 +14,13 @@ class StartScreen extends Component {
     }
   }
   
-    async componentDidMount() {
-      const { status } = await Permissions.askAsync(
-        Permissions.CAMERA,
-        Permissions.LOCATION,
-      );
-      this.setState({ hasPermission: status === 'granted' });
-    }
+  async componentDidMount() {
+    const { status } = await Permissions.askAsync(
+      Permissions.CAMERA,
+      Permissions.LOCATION,
+    );
+    this.setState({ hasPermission: status === 'granted' });
+  }
 
   resetNavigationStack = (message, location) => {
     const resetAction = StackActions.reset({

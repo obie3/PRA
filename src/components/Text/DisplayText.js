@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { Text, View, TouchableHighlight } from 'react-native';
+import { Text, View, TouchableWithoutFeedback  } from 'react-native';
 import PropTypes from 'prop-types';
 
 
@@ -12,7 +12,7 @@ export default class DisplayText extends Component {
 
     return(
       <View>
-        <TouchableHighlight 
+        <TouchableWithoutFeedback 
           disabled ={disabled}
           onPress = {onPress}
           style={{opacity: opacityStyle}}>
@@ -24,7 +24,7 @@ export default class DisplayText extends Component {
           > 
             { text }
           </Text>
-        </TouchableHighlight>
+        </TouchableWithoutFeedback>
       </View>
     );
   }
