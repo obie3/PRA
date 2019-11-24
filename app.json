@@ -25,8 +25,9 @@
       "permissions": [
         "com.htc.launcher.permission.UPDATE_SHORTCUT",
         "CAMERA",
-        "READ_PHONE_STATE",
-        "LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "READ_PHONE_STATE"
       ],
       "splash": {
         "resizeMode": "contain",

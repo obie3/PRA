@@ -3,6 +3,7 @@ import { View, SafeAreaView , Image, TouchableOpacity,StyleSheet} from 'react-na
 import styles from './styles';
 import {DisplayText, AuthBackground} from '../../components';
 import { NavigationActions, StackActions } from 'react-navigation';
+import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 
 
@@ -15,10 +16,7 @@ class StartScreen extends Component {
   }
   
   async componentDidMount() {
-    const { status } = await Permissions.askAsync(
-      Permissions.CAMERA,
-      Permissions.LOCATION,
-    );
+    const { status } = await Permissions.askAsync(Permissions.CAMERA, Permissions.LOCATION);
     this.setState({ hasPermission: status === 'granted' });
   }
 
@@ -33,7 +31,7 @@ class StartScreen extends Component {
     return this.props.navigation.dispatch(resetAction); 
   }
 
-  handleSnap = () => {
+  handleSnap = async () => {
     const{hasPermission} = this.state;
     if (hasPermission === null) {
       return <View />;
@@ -42,6 +40,10 @@ class StartScreen extends Component {
       return this.resetNavigationStack('Grant Camera and Location Permission to Continue', 'Error');
     } 
     else{
+      // const { status } = await Permissions.askAsync(Permissions.LOCATION);
+      // if (status === false || status === null) {
+      //   return this.resetNavigationStack('Grant Location Permission to Continue', 'Error');
+      // } 
       return this.resetNavigationStack('', 'Home');
 
     }
